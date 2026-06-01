@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import { matchesRouter } from './routes/matches.js';
 import { swaggerSpec } from './swagger/swagger.js';
 import { attachWebsocketServer } from './ws/server.js';
+import { securityMiddleware } from './arcjet.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Sport API!' });
 });
 
+app.use(securityMiddleware());
 app.use('/api/matches', matchesRouter);
 
 const { broadCastMatchCreated } = attachWebsocketServer(server);
