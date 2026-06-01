@@ -38,7 +38,6 @@ const options = {
             endTime: {
               type: 'string',
               format: 'date-time',
-              nullable: true,
               example: '2026-06-01T17:00:00Z',
             },
             homeScore: { type: 'integer', example: 0 },

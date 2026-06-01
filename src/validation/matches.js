@@ -45,7 +45,7 @@ export const createMatchSchema = z
 
     if (!Number.isNaN(startTimeMs) && !Number.isNaN(endTimeMs) && endTimeMs <= startTimeMs) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['endTime'],
         message: 'endTime must be after startTime',
       });
