@@ -99,8 +99,9 @@ matchesRouter.post('/', async (req, res) => {
 
   const { startTime, endTime, homeScore, awayScore } = parsed.data;
 
+  let event;
   try {
-    const [event] = await db.insert(matches).values({
+    [event] = await db.insert(matches).values({
       ...parsed.data,
       startTime: new Date(startTime),
       endTime: new Date(endTime),
@@ -108,15 +109,20 @@ matchesRouter.post('/', async (req, res) => {
       awayScore: awayScore ?? 0,
       status: getMatchStatus(startTime, endTime),
     }).returning();
-
-    if(res.app.locals.broadCastMatchCreated) {
-      res.app.locals.broadCastMatchCreated(event);
-    }
-
-    res.status(201).json({ data: event });
   } catch (error) {
     console.error('Error creating match:', error);
     res.status(500).json({ error: 'An error occurred while creating the match' });
+    return;
+  }
+
+  res.status(201).json({ data: event });
+
+  if (res.app.locals.broadCastMatchCreated) {
+    try {
+      res.app.locals.broadCastMatchCreated(event);
+    } catch (error) {
+      console.error('Error broadcasting match creation:', error);
+    }
   }
 });
 

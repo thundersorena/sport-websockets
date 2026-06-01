@@ -22,10 +22,10 @@
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "ws": "^8.21.0",
-    "wscat": "^6.1.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10"
+    "drizzle-kit": "^0.31.10",
+    "wscat": "^6.1.0"
   }
 }
