@@ -1,11 +1,15 @@
 import 'dotenv/config';
 import express from 'express';
+import http from 'http';
 import swaggerUi from 'swagger-ui-express';
 import { matchesRouter } from './routes/matches.js';
 import { swaggerSpec } from './swagger/swagger.js';
+import { attachWebsocketServer } from './ws/server.js';
 
 const app = express();
-const PORT = 8000;
+const server = http.createServer(app);
+const PORT = process.env.PORT || 8000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 app.use(express.json());
 
@@ -17,7 +21,12 @@ app.get('/', (req, res) => {
 
 app.use('/api/matches', matchesRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Swagger UI at  http://localhost:${PORT}/api-docs`);
+const { broadCastMatchCreated } = attachWebsocketServer(server);
+app.locals.broadCastMatchCreated = broadCastMatchCreated;
+
+server.listen(PORT, HOST, () => {
+  const baseUrl = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
+  console.log(`Server running at ${baseUrl}`);
+  console.log(`Swagger UI at  ${baseUrl}/api-docs`);
+  console.log(`WebSocket running at  ${baseUrl.replace('http', 'ws')}/ws`);
 });
