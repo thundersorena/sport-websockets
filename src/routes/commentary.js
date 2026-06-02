@@ -153,10 +153,14 @@ commentaryRouter.post('/:id/commentary', async (req, res) => {
 
     // Broadcast to WebSocket subscribers
     if (res.app.locals.broadCastCommentary) {
+      try {
         console.log('[commentary:post] Broadcasting commentary to match', newCommentary.matchId);
         res.app.locals.broadCastCommentary(newCommentary.matchId, newCommentary);
+      } catch (broadcastError) {
+        console.error('[commentary:post] Failed to broadcast commentary:', broadcastError);
+      }
     } else {
-        console.warn('[commentary:post] broadCastCommentary function not available');
+      console.warn('[commentary:post] broadCastCommentary function not available');
     }
 
     res.status(201).json({ data: newCommentary });
