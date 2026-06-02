@@ -149,9 +149,17 @@ commentaryRouter.post('/:id/commentary', async (req, res) => {
       tags: tags || [],
     }).returning();
 
-    res.status(200).json({ data: newCommentary });
+    res.status(201).json({ data: newCommentary });
   } catch (error) {
     console.error('Error creating commentary:', error);
+    
+    if (error.code === '23503' || error.constraint?.includes('match_id')) {
+      return res.status(404).json({ 
+        error: 'Match not found',
+        details: `Cannot create commentary for match ID ${matchId} - match does not exist`
+      });
+    }
+    
     res.status(500).json({ error: 'An error occurred while creating the commentary' });
   }
 });
