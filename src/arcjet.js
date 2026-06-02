@@ -21,7 +21,7 @@ export const wsArcjet = arcjetKey ? arcjet({
  key: arcjetKey,
   rules: [
     shield({mode : arcjetMode}),
-    detectBot({mode : arcjetMode , allow: ['SEARCH_ENGINE', 'MONITORING' ,'PREVIEW']}),
+    detectBot({mode : arcjetMode , allow: ['CURL', 'SEARCH_ENGINE', 'MONITORING' ,'PREVIEW', 'AUTOMATED']}),
     slidingWindow({mode : arcjetMode , interval: '2s', max: 5}),
   ],
 }) : null;
