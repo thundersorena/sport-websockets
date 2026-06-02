@@ -5,12 +5,14 @@ import swaggerUi from 'swagger-ui-express';
 import { matchesRouter } from './routes/matches.js';
 import { swaggerSpec } from './swagger/swagger.js';
 import { attachWebsocketServer } from './ws/server.js';
+import { securityMiddleware } from './arcjet.js';
 
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+app.use(securityMiddleware());
 app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
