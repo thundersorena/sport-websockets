@@ -149,6 +149,16 @@ commentaryRouter.post('/:id/commentary', async (req, res) => {
       tags: tags || [],
     }).returning();
 
+    console.log('[commentary:post] Created new commentary:', newCommentary);
+
+    // Broadcast to WebSocket subscribers
+    if (res.app.locals.broadCastCommentary) {
+        console.log('[commentary:post] Broadcasting commentary to match', newCommentary.matchId);
+        res.app.locals.broadCastCommentary(newCommentary.matchId, newCommentary);
+    } else {
+        console.warn('[commentary:post] broadCastCommentary function not available');
+    }
+
     res.status(201).json({ data: newCommentary });
   } catch (error) {
     console.error('Error creating commentary:', error);

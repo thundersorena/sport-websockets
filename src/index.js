@@ -25,8 +25,9 @@ app.get('/', (req, res) => {
 app.use('/api/matches', matchesRouter);
 app.use('/api/matches', commentaryRouter);
 
-const { broadCastMatchCreated } = attachWebsocketServer(server);
+const { broadCastMatchCreated , broadCastCommentary } = attachWebsocketServer(server);
 app.locals.broadCastMatchCreated = broadCastMatchCreated;
+app.locals.broadCastCommentary = broadCastCommentary;
 
 server.listen(PORT, HOST, () => {
   const baseUrl = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
