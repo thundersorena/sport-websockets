@@ -173,19 +173,29 @@ function handleMessage(socket, rawData) {
     console.log('[ws:handleMessage] Message type:', message.type);
 
     // Handle subscribe
+    const MAX_SUBSCRIPTIONS_PER_SOCKET = 100;
     if (message.type === 'subscribe') {
         console.log('[ws:handleMessage] Processing subscribe request for matchId:', message.matchId);
         
-        if (!Number.isInteger(message.matchId)) {
+        if (!Number.isSafeInteger(message.matchId) || message.matchId <= 0) {
             console.log('[ws:handleMessage] Invalid matchId (not an integer):', message.matchId);
             sendJson(socket, { 
                 type: 'error', 
-                message: 'matchId must be an integer',
+                message: 'matchId must be a positive integer',
                 received: message.matchId
             });
             return;
         }
-
+        if (
+            !socket.subscriptions.has(message.matchId) &&
+            socket.subscriptions.size >= MAX_SUBSCRIPTIONS_PER_SOCKET
+        ) {
+            sendJson(socket, {
+                type: 'error',
+                message: 'Subscription limit exceeded',
+            });
+            return;
+        }
         subscribe(message.matchId, socket);
         socket.subscriptions.add(message.matchId);
         
