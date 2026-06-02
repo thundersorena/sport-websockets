@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 app.use(express.json());
-app.use(securityMiddleware());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -21,6 +20,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Sport API!' });
 });
 
+app.use(securityMiddleware());
 app.use('/api/matches', matchesRouter);
 
 const { broadCastMatchCreated } = attachWebsocketServer(server);

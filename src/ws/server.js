@@ -36,23 +36,23 @@ export function attachWebsocketServer (server) {
 
     wss.on('connection' , async (socket, request) => {
 
-        if(wsArcjet) {
-            try {
-                const decision = await wsArcjet.protect(request);
+        // if(wsArcjet) {
+        //     try {
+        //         const decision = await wsArcjet.protect(request);
 
-                if (decision.isDenied()) {
-                    const code = decision.reason.isRateLimit() ? 1013 : 1008;
-                    const reason = decision.reason.isRateLimit() ? 'Rate limit exceeded' : 'Access denied by Arcjet';
-                    socket.close(code, reason);
-                    return; 
-                }
+        //         if (decision.isDenied()) {
+        //             const code = decision.reason.isRateLimit() ? 1013 : 1008;
+        //             const reason = decision.reason.isRateLimit() ? 'Rate limit exceeded' : 'Access denied by Arcjet';
+        //             socket.close(code, reason);
+        //             return; 
+        //         }
 
-            } catch (err) {
-                console.error('Arcjet WebSocket error:', err);
-                socket.close(1011, 'Server security check failed');
-                return;
-            }
-        }
+        //     } catch (err) {
+        //         console.error('Arcjet WebSocket error:', err);
+        //         socket.close(1011, 'Server security check failed');
+        //         return;
+        //     }
+        // }
 
         socket.isAlive = true;
 

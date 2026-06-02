@@ -10,7 +10,8 @@ export const httpArcjet = arcjetKey ? arcjet({
   key: arcjetKey,
   rules: [
     shield({mode : arcjetMode}),
-    detectBot({mode : arcjetMode , allow: ['CATEGORY:SEARCH_ENGINE', 'CATEGORY:MONITORING' ,'CATEGORY:PREVIEW']}),
+    detectBot({mode : arcjetMode , allow: ['CURL', 'SEARCH_ENGINE', 'MONITORING' ,'PREVIEW', 'AUTOMATED']}),
+
     slidingWindow({mode : arcjetMode , interval: '10s', max: 50}),
   ],
 }) : null;
@@ -20,7 +21,7 @@ export const wsArcjet = arcjetKey ? arcjet({
  key: arcjetKey,
   rules: [
     shield({mode : arcjetMode}),
-    detectBot({mode : arcjetMode , allow: ['CATEGORY:SEARCH_ENGINE', 'CATEGORY:MONITORING' ,'CATEGORY:PREVIEW']}),
+    detectBot({mode : arcjetMode , allow: ['SEARCH_ENGINE', 'MONITORING' ,'PREVIEW']}),
     slidingWindow({mode : arcjetMode , interval: '2s', max: 5}),
   ],
 }) : null;
@@ -30,9 +31,13 @@ export function securityMiddleware () {
     return async (req, res, next) => {
         if(!httpArcjet) return next();
 
+        // Ensure user-agent header exists for detectBot
+        if (!req.headers['user-agent']) {
+            req.headers['user-agent'] = 'Unknown';
+        }
+
         try {
             const decision = await httpArcjet.protect(req);
-
 
             if (decision.isDenied()) {
                 if(decision.reason.isRateLimit()) {
