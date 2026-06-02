@@ -19,6 +19,10 @@ const options = {
         name: 'Matches',
         description: 'Create and manage sport matches',
       },
+      {
+        name: 'Commentary',
+        description: 'Live commentary and events for matches',
+      },
     ],
     components: {
       schemas: {
@@ -64,6 +68,38 @@ const options = {
           properties: {
             homeScore: { type: 'integer', minimum: 0, example: 2 },
             awayScore: { type: 'integer', minimum: 0, example: 1 },
+          },
+        },
+        Commentary: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', example: 1 },
+            matchId: { type: 'integer', example: 1 },
+            minute: { type: 'integer', minimum: 0, example: 45 },
+            sequence: { type: 'integer', minimum: 0, example: 1 },
+            period: { type: 'string', example: '1st Half' },
+            eventType: { type: 'string', example: 'goal' },
+            actor: { type: 'string', example: 'John Doe' },
+            team: { type: 'string', example: 'Arsenal' },
+            message: { type: 'string', example: 'Goal! Amazing strike from outside the box!' },
+            metadata: { type: 'object', nullable: true, example: { assistedBy: 'Jane Smith' } },
+            tags: { type: 'array', items: { type: 'string' }, example: ['goal', 'highlight'] },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateCommentaryInput: {
+          type: 'object',
+          required: ['minute', 'sequence', 'period', 'eventType', 'message'],
+          properties: {
+            minute: { type: 'integer', minimum: 0, example: 45 },
+            sequence: { type: 'integer', minimum: 0, example: 1 },
+            period: { type: 'string', example: '1st Half' },
+            eventType: { type: 'string', example: 'goal' },
+            actor: { type: 'string', example: 'John Doe' },
+            team: { type: 'string', example: 'Arsenal' },
+            message: { type: 'string', example: 'Goal! Amazing strike from outside the box!' },
+            metadata: { type: 'object', example: { assistedBy: 'Jane Smith' } },
+            tags: { type: 'array', items: { type: 'string' }, example: ['goal', 'highlight'] },
           },
         },
       },

@@ -6,6 +6,7 @@ import { matchesRouter } from './routes/matches.js';
 import { swaggerSpec } from './swagger/swagger.js';
 import { attachWebsocketServer } from './ws/server.js';
 import { securityMiddleware } from './arcjet.js';
+import { commentaryRouter } from './routes/commentary.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/matches', matchesRouter);
+app.use('/api/matches', commentaryRouter);
 
 const { broadCastMatchCreated } = attachWebsocketServer(server);
 app.locals.broadCastMatchCreated = broadCastMatchCreated;
