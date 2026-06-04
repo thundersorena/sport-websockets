@@ -232,6 +232,15 @@ matchesRouter.patch('/:id/score', async (req, res) => {
       return res.status(404).json({ error: 'Match not found' });
     }
     res.json({ data: updated });
+
+    // Broadcast score update via WebSocket
+    if (res.app.locals.broadCastScoreUpdate) {
+      try {
+        res.app.locals.broadCastScoreUpdate(updated);
+      } catch (error) {
+        console.error('Error broadcasting score update:', error);
+      }
+    }
   } catch (error) {
     console.error('Error updating score:', error);
     res.status(500).json({ error: 'An error occurred while updating the score' });

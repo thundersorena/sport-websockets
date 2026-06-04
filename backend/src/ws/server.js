@@ -362,7 +362,12 @@ export function attachWebsocketServer(server) {
         broadcastToMatch(matchId, { type: 'commentary', data: comment });
     }
 
+    function broadCastScoreUpdate(match) {
+        console.log('[ws:broadcast] Broadcasting score_update event for match:', match.id);
+        broadcastToMatch(match.id, { type: 'score_update', data: match });
+    }
+
     console.log('[ws:init] WebSocket server fully initialized and listening');
 
-    return { broadCastMatchCreated, broadCastCommentary };
+    return { broadCastMatchCreated, broadCastCommentary, broadCastScoreUpdate };
 }
