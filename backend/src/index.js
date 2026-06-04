@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import http from 'http';
 import swaggerUi from 'swagger-ui-express';
 import { matchesRouter } from './routes/matches.js';
@@ -13,6 +14,10 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(securityMiddleware());
 app.use(express.json());
 
@@ -25,9 +30,10 @@ app.get('/', (req, res) => {
 app.use('/api/matches', matchesRouter);
 app.use('/api/matches', commentaryRouter);
 
-const { broadCastMatchCreated , broadCastCommentary } = attachWebsocketServer(server);
+const { broadCastMatchCreated , broadCastCommentary, broadCastScoreUpdate } = attachWebsocketServer(server);
 app.locals.broadCastMatchCreated = broadCastMatchCreated;
 app.locals.broadCastCommentary = broadCastCommentary;
+app.locals.broadCastScoreUpdate = broadCastScoreUpdate;
 
 server.listen(PORT, HOST, () => {
   const baseUrl = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
