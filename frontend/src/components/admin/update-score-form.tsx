@@ -1,33 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { matchesService } from "@/services/matches";
-import { Match, MatchStatus } from "@/types/api";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { matchesService } from "@/services/matches";
+import { Match } from "@/types/api";
+import { SlToast } from "@/components/ui/sl-toast";
+import { Field, FieldError, FormHead } from "./form-parts";
 
 export function UpdateScoreForm() {
-  const [loading, setLoading] = useState(false);
-  const [loadingMatches, setLoadingMatches] = useState(true);
   const [matches, setMatches] = useState<Match[]>([]);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-  const [formData, setFormData] = useState({
-    matchId: "",
-    homeScore: 0,
-    awayScore: 0,
-  });
+  const [loadingMatches, setLoadingMatches] = useState(true);
+  const [matchId, setMatchId] = useState("");
+  const [homeScore, setHomeScore] = useState(0);
+  const [awayScore, setAwayScore] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     loadMatches();
@@ -37,160 +25,140 @@ export function UpdateScoreForm() {
     try {
       const data = await matchesService.getMatches();
       setMatches(data);
-    } catch (error) {
-      console.error("Failed to load matches:", error);
+    } catch (err) {
+      console.error("Failed to load matches:", err);
     } finally {
       setLoadingMatches(false);
     }
   };
 
-  const handleMatchSelect = (matchId: string) => {
-    const match = matches.find((m) => m.id.toString() === matchId);
+  const handleSelect = (id: string) => {
+    setMatchId(id);
+    const match = matches.find((m) => m.id.toString() === id);
     if (match) {
-      setFormData({
-        matchId,
-        homeScore: match.homeScore,
-        awayScore: match.awayScore,
-      });
+      setHomeScore(match.homeScore);
+      setAwayScore(match.awayScore);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.matchId) {
-      setMessage({ type: "error", text: "Please select a match" });
+    setError(null);
+    if (!matchId) {
+      setError("Please select a match.");
       return;
     }
-
     setLoading(true);
-    setMessage(null);
-
     try {
-      const match = await matchesService.updateScore(
-        parseInt(formData.matchId),
-        {
-          homeScore: formData.homeScore,
-          awayScore: formData.awayScore,
-        },
-      );
-
-      setMessage({
-        type: "success",
-        text: "Score updated successfully! Check the match page.",
+      await matchesService.updateScore(parseInt(matchId, 10), {
+        homeScore: Math.max(0, homeScore),
+        awayScore: Math.max(0, awayScore),
       });
-      // Reload matches to get updated data
+      setToast("Score pushed live");
       await loadMatches();
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Failed to update score. Please try again.",
-      });
-      console.error("Update score error:", error);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update score. Try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const selectedMatch = matches.find(
-    (m) => m.id.toString() === formData.matchId,
-  );
+  const selected = matches.find((m) => m.id.toString() === matchId);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="matchId">Select Match *</Label>
+    <form onSubmit={handleSubmit}>
+      <FormHead title="Update Score" desc="Scores roll live on every screen." />
+
+      <Field label="Match" style={{ marginBottom: 14 }}>
         {loadingMatches ? (
-          <div className="flex items-center justify-center p-4">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div style={{ display: "flex", padding: "8px 0" }}>
+            <Loader2
+              className="animate-spin"
+              style={{ color: "var(--sl-muted)" }}
+              width={20}
+              height={20}
+            />
           </div>
         ) : (
-          <Select value={formData.matchId} onValueChange={handleMatchSelect}>
-            <SelectTrigger id="matchId">
-              <SelectValue placeholder="Choose a match to update" />
-            </SelectTrigger>
-            <SelectContent>
-              {matches.map((match) => (
-                <SelectItem key={match.id} value={match.id.toString()}>
-                  {match.homeTeam} vs {match.awayTeam} ({match.status})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select
+            className="sl-select"
+            value={matchId}
+            onChange={(e) => handleSelect(e.target.value)}
+          >
+            <option value="" disabled>
+              Choose a match to update
+            </option>
+            {matches.map((m) => (
+              <option key={m.id} value={m.id.toString()}>
+                {m.homeTeam} vs {m.awayTeam} ({m.status})
+              </option>
+            ))}
+          </select>
         )}
-      </div>
+      </Field>
 
-      {selectedMatch && (
-        <>
-          <div className="p-4 rounded-md bg-muted">
-            <div className="text-sm font-medium mb-2">Current Score:</div>
-            <div className="text-lg">
-              {selectedMatch.homeTeam} {selectedMatch.homeScore} -{" "}
-              {selectedMatch.awayScore} {selectedMatch.awayTeam}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="homeScore">{selectedMatch.homeTeam} Score</Label>
-              <Input
-                id="homeScore"
-                type="number"
-                min="0"
-                value={formData.homeScore}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    homeScore: parseInt(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="awayScore">{selectedMatch.awayTeam} Score</Label>
-              <Input
-                id="awayScore"
-                type="number"
-                min="0"
-                value={formData.awayScore}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    awayScore: parseInt(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
-          </div>
-        </>
-      )}
-
-      {message && (
+      {selected && (
         <div
-          className={`p-3 rounded-md text-sm ${
-            message.type === "success"
-              ? "bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800"
-              : "bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800"
-          }`}
+          className="sl-mono"
+          style={{
+            fontSize: 13,
+            color: "var(--sl-muted)",
+            background: "var(--sl-bg2)",
+            border: "1px solid var(--sl-border)",
+            borderRadius: 9,
+            padding: "10px 12px",
+            marginBottom: 14,
+          }}
         >
-          {message.text}
+          Current: {selected.homeTeam} {selected.homeScore} – {selected.awayScore}{" "}
+          {selected.awayTeam}
         </div>
       )}
 
-      <Button
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <Field label="Home Score">
+          <input
+            className="sl-input sl-condensed"
+            style={{ fontWeight: 700, fontSize: 20 }}
+            type="number"
+            min={0}
+            value={homeScore}
+            onChange={(e) => setHomeScore(parseInt(e.target.value, 10) || 0)}
+          />
+        </Field>
+        <Field label="Away Score">
+          <input
+            className="sl-input sl-condensed"
+            style={{ fontWeight: 700, fontSize: 20 }}
+            type="number"
+            min={0}
+            value={awayScore}
+            onChange={(e) => setAwayScore(parseInt(e.target.value, 10) || 0)}
+          />
+        </Field>
+      </div>
+
+      <FieldError message={error} />
+
+      <button
         type="submit"
-        disabled={loading || !formData.matchId}
-        className="w-full"
+        className="sl-submit"
+        style={{
+          marginTop: 20,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+        }}
+        disabled={loading || !matchId}
       >
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Updating...
-          </>
-        ) : (
-          "Update Score"
-        )}
-      </Button>
+        {loading && <Loader2 className="animate-spin" width={16} height={16} />}
+        {loading ? "Pushing…" : "Push Score Update"}
+      </button>
+
+      <SlToast message={toast} onClose={() => setToast(null)} />
     </form>
   );
 }

@@ -1,10 +1,26 @@
 import type { Metadata } from "next";
 import "./style/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Geist } from "next/font/google";
+import { Barlow, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-barlow",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-barlow-condensed",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-jetbrains",
+});
 
 export const metadata: Metadata = {
   title: "Sport Live - Real-time Match Updates",
@@ -17,11 +33,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
-      <body className="min-h-screen flex flex-col antialiased">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn(
+        "sl-font-body",
+        barlow.variable,
+        barlowCondensed.variable,
+        jetbrainsMono.variable
+      )}
+    >
+      <body className="sl-font-body antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

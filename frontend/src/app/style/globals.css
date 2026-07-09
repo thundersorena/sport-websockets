@@ -172,3 +172,287 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
+
+/* =====================================================================
+   SPORT LIVE — design system (from Claude Design "Sport Live")
+   Tokens are namespaced with --sl-* so they never clobber shadcn tokens.
+   next-themes uses the class strategy, so light lives on :root and dark
+   on .dark. Default theme is dark (see layout ThemeProvider).
+   ===================================================================== */
+:root {
+  --sl-bg: #f4f4f2;
+  --sl-bg2: #ffffff;
+  --sl-card: #ffffff;
+  --sl-card2: #faf9f7;
+  --sl-border: #e6e5e1;
+  --sl-border2: #dad9d4;
+  --sl-fg: #0b0b0d;
+  --sl-muted: #6c6c72;
+  --sl-faint: #a1a1a8;
+  --sl-chip: #f0efec;
+  --sl-accent: #e11d2a;
+  --sl-accent2: #f2660c;
+  --sl-live: #e11d2a;
+  --sl-scheduled: #2563eb;
+  --sl-finished: #6b7280;
+  --sl-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 30px rgba(0, 0, 0, 0.07);
+  --sl-grad: linear-gradient(100deg, #e11d2a, #f2660c);
+}
+
+.dark {
+  --sl-bg: #0a0a0c;
+  --sl-bg2: #0f0f12;
+  --sl-card: #141418;
+  --sl-card2: #1a1a20;
+  --sl-border: #26262e;
+  --sl-border2: #33333d;
+  --sl-fg: #fafafa;
+  --sl-muted: #8b8b96;
+  --sl-faint: #5c5c66;
+  --sl-chip: #1c1c24;
+  --sl-accent: #ff3b3b;
+  --sl-accent2: #ff7a1a;
+  --sl-live: #ff3b3b;
+  --sl-scheduled: #5b9bff;
+  --sl-finished: #9aa0aa;
+  --sl-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 14px 34px rgba(0, 0, 0, 0.4);
+  --sl-grad: linear-gradient(100deg, #ff3b3b, #ff7a1a);
+}
+
+/* Font family helpers (font variables provided by next/font in layout.tsx) */
+.sl-font-body {
+  font-family: var(--font-barlow), system-ui, sans-serif;
+}
+.sl-condensed {
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", system-ui, sans-serif;
+}
+.sl-mono {
+  font-family: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Root app surface + base type */
+.sl-app {
+  min-height: 100vh;
+  background: var(--sl-bg);
+  color: var(--sl-fg);
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+.sl-app *,
+.sl-app *::before,
+.sl-app *::after {
+  box-sizing: border-box;
+}
+
+/* Keep the page canvas on-theme behind overscroll (wins: unlayered rule) */
+body {
+  background: var(--sl-bg);
+}
+
+/* Constrained content column */
+.sl-container {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Sticky translucent header */
+.sl-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--sl-bg) 82%, transparent);
+  border-bottom: 1px solid var(--sl-border);
+}
+
+/* Ghost nav button */
+.sl-navbtn {
+  background: transparent;
+  border: none;
+  color: var(--sl-fg);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.sl-navbtn:hover {
+  background: var(--sl-chip);
+}
+
+/* Bordered icon button (theme toggle) */
+.sl-iconbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--sl-border);
+  border-radius: 10px;
+  background: var(--sl-card);
+  color: var(--sl-fg);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.sl-iconbtn:hover {
+  background: var(--sl-chip);
+  border-color: var(--sl-border2);
+}
+
+/* Match card */
+.sl-card-el {
+  cursor: pointer;
+  background: var(--sl-card);
+  border: 1px solid var(--sl-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--sl-shadow);
+  transition: transform 0.25s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.sl-card-el:hover {
+  border-color: var(--sl-border2);
+  transform: translateY(-3px);
+}
+
+/* Filter tab */
+.sl-tab {
+  position: relative;
+  background: transparent;
+  border: none;
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 10px 16px 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* Gradient primary button */
+.sl-submit {
+  width: 100%;
+  background: var(--sl-grad);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 59, 59, 0.3);
+  transition: filter 0.2s;
+}
+.sl-submit:hover {
+  filter: brightness(1.08);
+}
+.sl-submit:disabled {
+  filter: grayscale(0.4) brightness(0.8);
+  cursor: not-allowed;
+}
+
+/* Form field label + controls */
+.sl-flabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-jetbrains), "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--sl-muted);
+  font-weight: 700;
+}
+.sl-input,
+.sl-select,
+.sl-textarea {
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--sl-fg);
+  background: var(--sl-bg2);
+  border: 1px solid var(--sl-border);
+  border-radius: 9px;
+  padding: 11px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.sl-input:focus,
+.sl-select:focus,
+.sl-textarea:focus {
+  border-color: var(--sl-accent);
+}
+.sl-textarea {
+  resize: vertical;
+}
+
+/* Animations */
+@keyframes sl-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+@keyframes sl-fadeup {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sl-pop {
+  0% { transform: scale(1.28); }
+  60% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+@keyframes sl-toast-in {
+  from { transform: translate(-50%, 120px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.sl-fadeup {
+  animation: sl-fadeup 0.5s ease both;
+}
+.sl-pop {
+  display: inline-block;
+  animation: sl-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.sl-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 100;
+  background: var(--sl-grad);
+  color: #fff;
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(255, 59, 59, 0.4);
+  animation: sl-toast-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Themed scrollbar */
+.sl-app ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.sl-app ::-webkit-scrollbar-thumb {
+  background: var(--sl-border2);
+  border-radius: 8px;
+  border: 2px solid var(--sl-bg);
+}

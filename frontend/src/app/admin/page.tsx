@@ -1,83 +1,95 @@
 "use client";
 
+import { useState } from "react";
 import { Header } from "@/components/header";
 import { CreateMatchForm } from "@/components/admin/create-match-form";
 import { UpdateScoreForm } from "@/components/admin/update-score-form";
 import { AddCommentaryForm } from "@/components/admin/add-commentary-form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+type AdminTab = "create" | "score" | "commentary";
+
+const TABS: { key: AdminTab; label: string }[] = [
+  { key: "create", label: "Create Match" },
+  { key: "score", label: "Update Score" },
+  { key: "commentary", label: "Commentary" },
+];
 
 export default function AdminPage() {
+  const [tab, setTab] = useState<AdminTab>("create");
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="sl-app">
       <Header />
-      <main className="flex-1 container py-8 px-4 md:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">
-              Manage matches, update scores, and add live commentary
-            </p>
-          </div>
+      <main className="sl-container" style={{ maxWidth: 760, padding: "34px 24px 80px" }}>
+        <h1
+          className="sl-condensed"
+          style={{
+            fontWeight: 800,
+            fontSize: 44,
+            textTransform: "uppercase",
+            letterSpacing: "-.3px",
+            margin: "0 0 4px",
+          }}
+        >
+          Admin Console
+        </h1>
+        <p style={{ color: "var(--sl-muted)", margin: "0 0 26px", fontSize: 15 }}>
+          Create matches, push scores, and broadcast commentary — every change
+          streams to viewers instantly.
+        </p>
 
-          <Tabs defaultValue="create" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="create">Create Match</TabsTrigger>
-              <TabsTrigger value="score">Update Score</TabsTrigger>
-              <TabsTrigger value="commentary">Add Commentary</TabsTrigger>
-            </TabsList>
+        {/* segmented control */}
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            background: "var(--sl-card)",
+            border: "1px solid var(--sl-border)",
+            borderRadius: 12,
+            padding: 5,
+            marginBottom: 22,
+          }}
+        >
+          {TABS.map((t) => {
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className="sl-condensed"
+                style={{
+                  flex: 1,
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  letterSpacing: ".5px",
+                  textTransform: "uppercase",
+                  padding: 10,
+                  borderRadius: 8,
+                  transition: "all .2s",
+                  color: active ? "#fff" : "var(--sl-muted)",
+                  background: active ? "var(--sl-grad)" : "transparent",
+                }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
 
-            <TabsContent value="create">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create New Match</CardTitle>
-                  <CardDescription>
-                    Create a new match. It will appear in real-time on the home
-                    page.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateMatchForm />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="score">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Update Match Score</CardTitle>
-                  <CardDescription>
-                    Update scores for an existing match. Changes appear
-                    instantly via WebSocket.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <UpdateScoreForm />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="commentary">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Add Live Commentary</CardTitle>
-                  <CardDescription>
-                    Add commentary for a match. Updates appear in real-time on
-                    the match detail page.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <AddCommentaryForm />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+        <div
+          style={{
+            background: "var(--sl-card)",
+            border: "1px solid var(--sl-border)",
+            borderRadius: 16,
+            boxShadow: "var(--sl-shadow)",
+            padding: 24,
+          }}
+        >
+          {tab === "create" && <CreateMatchForm />}
+          {tab === "score" && <UpdateScoreForm />}
+          {tab === "commentary" && <AddCommentaryForm />}
         </div>
       </main>
     </div>
