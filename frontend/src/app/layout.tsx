@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import FooterComponent from "@/components/footer";
 import "./style/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Barlow, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
@@ -51,6 +52,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <FooterComponent />
         </ThemeProvider>
       </body>
     </html>
