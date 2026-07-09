@@ -1,4 +1,7 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// In production, default to same-origin ("") — vercel.json rewrites route /api/* to the backend service
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
 
 export class ApiClient {
   private baseUrl: string;

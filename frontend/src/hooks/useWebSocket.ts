@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Match, Commentary } from "@/types/api";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws";
+function getWsUrl(): string {
+  if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
+  if (process.env.NODE_ENV !== "production") return "ws://localhost:8000/ws";
+  // In production, connect to the same origin — vercel.json rewrites route /ws to the backend service
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  return `${protocol}://${window.location.host}/ws`;
+}
 
 type WebSocketMessage =
   | { type: "match_created"; data: Match }
@@ -18,7 +24,7 @@ export function useWebSocket() {
 
   const connect = useCallback(() => {
     try {
-      const ws = new WebSocket(WS_URL);
+      const ws = new WebSocket(getWsUrl());
 
       ws.onopen = () => {
         console.log("WebSocket connected");
